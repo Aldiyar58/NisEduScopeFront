@@ -17,7 +17,7 @@ import axios from "axios";
 //   .env.development  → VITE_API_BASE_URL=http://localhost:8000
 //   .env.production   → VITE_API_BASE_URL=https://api.gradewatch.kz
 // ---------------------------------------------------------------------------
-const BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000";
+const BASE_URL = import.meta.env.VITE_API_URL ?? "http://localhost:8000";
 
 export const apiClient = axios.create({
   baseURL: `${BASE_URL}/api`,
