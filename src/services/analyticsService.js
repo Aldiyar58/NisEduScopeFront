@@ -12,6 +12,42 @@
 
 import { apiClient } from "./apiClient";
 
+/**
+ * Приводит ответ GET /analytics/assessment-types к виду { name, value }[],
+ * который ожидают Recharts Pie и aggregateByAssessmentType на клиенте.
+ *
+ * Бэкенд часто отдаёт assessment_type + count; без маппинга dataKey="value" даёт undefined.
+ *
+ * @param {unknown} payload
+ * @returns {import('../types').AssessmentTypeStat[]}
+ */
+export function normalizeAssessmentTypeStats(payload) {
+  if (payload == null) return [];
+  const raw = Array.isArray(payload)
+    ? payload
+    : Array.isArray(payload?.items)
+      ? payload.items
+      : Array.isArray(payload?.data)
+        ? payload.data
+        : [];
+
+  return raw
+    .map((row) => {
+      if (row == null || typeof row !== "object") return null;
+      const name =
+        row.name ??
+        row.assessment_type ??
+        row.type ??
+        row.label ??
+        "";
+      const n = Number(
+        row.value ?? row.count ?? row.changes ?? row.total ?? 0,
+      );
+      return { name: String(name), value: Number.isFinite(n) ? n : 0 };
+    })
+    .filter((row) => row && row.name.length > 0);
+}
+
 export const analyticsService = {
   /**
    * Статистика по учителям (GET /api/analytics/teachers)
@@ -49,7 +85,9 @@ export const analyticsService = {
    * Типы оценивания (СОР/СОЧ) - Добавь этот эндпоинт в FastAPI, если он нужен
    */
   getAssessmentTypeStats: () =>
-    apiClient.get("/analytics/assessment-types").then((r) => r.data),
+    apiClient
+      .get("/analytics/assessment-types")
+      .then((r) => normalizeAssessmentTypeStats(r.data)),
 
   /**
    * Общие KPI для карточек (GET /api/analytics/totals)

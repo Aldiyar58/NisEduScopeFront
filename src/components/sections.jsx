@@ -42,6 +42,15 @@ const TOOLTIP_STYLE = {
  * @param {{ teacherStats: import('../types').TeacherStat[] }} props
  */
 export function TeacherSection({ teacherStats }) {
+  const formatAvgDelta = (value) => {
+    const n = Number(value);
+    if (!Number.isFinite(n)) return "-";
+    return n.toFixed(1);
+  };
+
+  const getCorrectionCount = (row, primaryKey, fallbackKey) =>
+    row?.[primaryKey] ?? row?.[fallbackKey] ?? -1;
+
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
       <AnalyticsChart title="Учителя — среднее изменение баллов">
@@ -62,7 +71,25 @@ export function TeacherSection({ teacherStats }) {
           columns={[
             { key: "author",  label: "Учитель" },
             { key: "changes", label: "Кол-во правок" },
-            { key: "avgDelta", label: "Ср. Δ", render: (v) => <DeltaBadge delta={v} /> },
+            {
+              key: "avgDelta",
+              label: "Ср. балл",
+              render: (v) => (
+                <span style={{ fontWeight: 700 }}>
+                  {formatAvgDelta(v)}
+                </span>
+              ),
+            },
+            {
+              key: "sor_corrections_count",
+              label: "Корректировки СОР",
+              render: (_, row) => getCorrectionCount(row, "sor_corrections_count", "sorCorrectionsCount"),
+            },
+            {
+              key: "soch_corrections_count",
+              label: "Корректировки СОЧ",
+              render: (_, row) => getCorrectionCount(row, "soch_corrections_count", "sochCorrectionsCount"),
+            },
             { key: "ups",   label: "↑ Повышений", render: (v) => <span style={{ color: PALETTE.up,   fontWeight: 700 }}>{v}</span> },
             { key: "downs", label: "↓ Понижений", render: (v) => <span style={{ color: PALETTE.down, fontWeight: 700 }}>{v}</span> },
             { key: "neutral", label: "= Без изм.", render: (v) => <span style={{ color: PALETTE.neutral }}>{v}</span> },

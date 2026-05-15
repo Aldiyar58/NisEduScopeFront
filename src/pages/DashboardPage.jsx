@@ -199,7 +199,7 @@ export function DashboardPage() {
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
               <AnalyticsChart title="Топ учителей по правкам">
                 <ResponsiveContainer width="100%" height={200}>
-                  <BarChart data={analytics.teacherStats.slice(0, 5)}>
+                  <BarChart data={[...analytics.teacherStats].sort((a, b) => b.changes - a.changes).slice(0, 5)}>
                     <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
                     <XAxis dataKey="author" tick={{ fontSize: 10, fill: "var(--muted)" }} />
                     <YAxis tick={{ fontSize: 11, fill: "var(--muted)" }} />
@@ -211,7 +211,7 @@ export function DashboardPage() {
 
               <AnalyticsChart title="Топ предметов">
                 <ResponsiveContainer width="100%" height={200}>
-                  <BarChart data={analytics.subjectStats.slice(0, 5)} layout="vertical" margin={{ left: 10 }}>
+                  <BarChart data={[...analytics.subjectStats].sort((a, b) => b.changes - a.changes).slice(0, 5)} layout="vertical" margin={{ left: 10 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
                     <XAxis type="number" tick={{ fontSize: 11, fill: "var(--muted)" }} />
                     <YAxis dataKey="subject" type="category" tick={{ fontSize: 11, fill: "var(--muted)" }} width={80} />
